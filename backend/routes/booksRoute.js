@@ -2,16 +2,17 @@ import { Router } from "express";
 import {
   createBook,
   deleteBook,
-  getAllBooks,
   getBook,
+  getAllBooks,
   searchBook,
   updateBook,
 } from "../controllers/bookController.js";
 const router = Router();
 
-router.get("/search", searchBook);
 //get all books
-// router.get("", getAllBooks);
+router.get("", getAllBooks);
+
+router.get("/search", searchBook);
 
 // get a book with specific id
 router.get("/:id", getBook);

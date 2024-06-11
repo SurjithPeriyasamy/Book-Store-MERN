@@ -1,4 +1,5 @@
 import { Book } from "../models/bookModel.js";
+import { catchError } from "../utils/catchError.js";
 
 export const getAllBooks = async (req, res) => {
   try {
@@ -9,11 +10,12 @@ export const getAllBooks = async (req, res) => {
     const books = await Book.find();
     res.status(200).json({ count: books.length, data: ans });
   } catch (error) {
-    res.status(500).send({ message: error.message });
+    next(catchError(error.message));
+    // res.status(500).send({ message: error.message });
   }
 };
 
-export const searchBook = async (req, res) => {
+export const searchBook = async (req, res, next) => {
   const text = req.query.query;
   try {
     const data = await Book.find({ author: new RegExp(text, "i") });
@@ -22,21 +24,23 @@ export const searchBook = async (req, res) => {
     // );
     // console.log(ans);
     if (!data.length) {
-      return res.status(404).json({ message: "Book was not found" });
+      return next(catchError("Book was not found", 404));
+      // res.status(404).json({ message: "Book was not found" });
     }
     res.status(200).json({ count: data.length, data });
   } catch (error) {
-    res.status(500).send({ message: error.message });
+    next(catchError(error.message));
+    // res.status(500).send({ message: error.message });
   }
 };
 
 export const getBook = async (req, res) => {
   try {
-    // const book = await Book.findOne().where("_id").equals(req.params.id);
     const book = await Book.findById(req.params.id);
     res.status(200).json({ data: book });
   } catch (error) {
-    res.status(500).send({ message: error.message });
+    next(catchError(error.message));
+    // res.status(500).send({ message: error.message });
   }
 };
 
@@ -53,15 +57,17 @@ export const createBook = async (req, res) => {
     });
     res.status(201).send({ message: "Book Created Successfully" });
   } catch (error) {
-    res.status(500).send({ message: error.message });
+    next(catchError(error.message));
+    // res.status(500).send({ message: error.message });
   }
 };
 
-export const updateBook = async (req, res) => {
+export const updateBook = async (req, res, next) => {
   try {
     const { title, author, publishYear } = req.body;
     if (!title || !author || !publishYear) {
-      return res.status(400).send("send the all required fileds");
+      return next(catchError("Book was not found", 400));
+      // res.status(400).send("send the all required fileds");
     }
     const { id } = req.params;
     const result = await Book.findByIdAndUpdate(id, req.body);
@@ -69,10 +75,13 @@ export const updateBook = async (req, res) => {
     // if (!result) {
     //   return res.status(404).json({ message: "Book was not found" });
     // }
+
     const data = await Book.find();
     res.status(200).json({ count: data.length, data });
   } catch (error) {
-    res.status(500).send({ message: "Book was not found" });
+    next(catchError("Book was not found"));
+
+    // res.status(500).send({ message: "Book was not found" });
   }
 };
 
@@ -82,6 +91,7 @@ export const deleteBook = async (req, res) => {
     const data = await Book.find();
     res.status(200).json({ count: data.length, data });
   } catch (error) {
-    res.status(500).send({ message: "Book was not found" });
+    next(catchError("Book was not found"));
+    // res.status(500).send({ message: "Book was not found" });
   }
 };
