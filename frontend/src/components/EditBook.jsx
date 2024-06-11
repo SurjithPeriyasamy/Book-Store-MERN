@@ -4,7 +4,7 @@ import CreateAndEditBook from "./CreateAndEditBook";
 
 function EditBook() {
   const { id } = useParams();
-  return <CreateAndEditBook method="put" url={API_BASE_URL + "/" + id} />;
+  return <CreateAndEditBook method="put" url={`${API_BASE_URL}/books/${id}`} />;
 }
 
 export default EditBook;

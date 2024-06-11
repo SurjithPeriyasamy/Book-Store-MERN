@@ -14,7 +14,7 @@ const ShowBook = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const data = await fetch(API_BASE_URL + "/" + id);
+      const data = await fetch(API_BASE_URL + "/books/" + id);
       const json = await data.json();
       setBook(json.data);
       setLoading(false);

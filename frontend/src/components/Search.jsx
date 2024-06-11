@@ -18,7 +18,7 @@ const Search = ({ setBooks }) => {
           (async function () {
             try {
               const data = await fetch(
-                `${API_BASE_URL}/search?query=${authorSearch}`
+                `${API_BASE_URL}/books/search?query=${authorSearch}`
               );
               const json = await data.json();
               console.log(json);
