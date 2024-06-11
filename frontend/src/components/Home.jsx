@@ -11,22 +11,30 @@ import { addBooks } from "../utils/booksSlice";
 import { API_BASE_URL } from "../utils/constants";
 const Home = () => {
   const allBooks = useSelector((store) => store.books);
-  const [books, setBooks] = useState(allBooks.books);
+  const [books, setBooks] = useState([]);
   // const [skipCount, setSkipCount] = useState(0);
   const [currPage, setCurrpage] = useState(1);
   const [loading, setLoading] = useState(false);
   const skipCalc = (currPage - 1) * 3;
   const dispatch = useDispatch();
+  const token = useSelector((store) => store.user.loggedInUser.accessToken);
 
   useEffect(() => {
     fetchData();
   }, [currPage]);
+
   const fetchData = async () => {
     try {
       setLoading(true);
-      const data = await fetch(`${API_BASE_URL}?skip=${skipCalc}&limit=3`);
+      const data = await fetch(
+        `${API_BASE_URL}/books?skip=${skipCalc}&limit=3`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       const json = await data.json();
-      console.log(json);
+
       setBooks(json.data);
       dispatch(addBooks(json));
       setLoading(false);
@@ -39,7 +47,7 @@ const Home = () => {
   for (let i = 1; i <= Math.ceil(allBooks.count / 3); i++) {
     page.push(i);
   }
-  console.log(currPage);
+  console.log(books);
   return (
     <div className="space-y-5">
       <div className="mt-8 flex justify-between items-center">

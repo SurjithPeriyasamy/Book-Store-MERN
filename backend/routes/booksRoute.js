@@ -7,8 +7,10 @@ import {
   searchBook,
   updateBook,
 } from "../controllers/bookController.js";
+import { validateToken } from "../middlewares/validateTokenHandler.js";
 const router = Router();
 
+router.use(validateToken);
 //get all books
 router.get("", getAllBooks);
 

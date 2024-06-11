@@ -43,17 +43,18 @@ export const login = async (req, res, next) => {
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
-          expiresIn: "1m",
+          expiresIn: "10m",
         }
       );
-      const cookieOptions = {
-        httpOnly: true,
-        maxAge: 1000 * 60 * 60,
-      };
-      res.cookie("jwt", accessToken, cookieOptions);
-      res.status(200).json({ data: user });
+      // const cookieOptions = {
+      //   // httpOnly: true,
+      //   // secure: process.env.NODE_ENV === "production",
+      //   maxAge: 1000 * 60 * 60,
+      // };
+      // res.cookie("jwt", accessToken, cookieOptions);
+      res.status(200).json({ data: user, accessToken });
     } else {
-      return next(catchError("User not Registered", 400));
+      return next(catchError("email or password is not valid", 401));
       // res.status(400).json({ message: "User not Registered" });
     }
   } catch (error) {
@@ -63,5 +64,5 @@ export const login = async (req, res, next) => {
 };
 
 export const currentUser = (req, res) => {
-  res.json({ message: "currentUser" });
+  res.json({ message: "currentUser", user: req.user });
 };

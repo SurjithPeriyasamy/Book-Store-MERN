@@ -10,6 +10,8 @@ const Search = ({ setBooks }) => {
   const books = useSelector((store) => store.books.books);
   const dispatch = useDispatch();
   useEffect(() => {
+    console.log("child", books);
+
     const debounce = setTimeout(() => {
       if (authorResults[authorSearch]) {
         setBooks(authorResults[authorSearch]);
@@ -21,7 +23,6 @@ const Search = ({ setBooks }) => {
                 `${API_BASE_URL}/books/search?query=${authorSearch}`
               );
               const json = await data.json();
-              console.log(json);
               setBooks(json.data);
               dispatch(
                 addResults({

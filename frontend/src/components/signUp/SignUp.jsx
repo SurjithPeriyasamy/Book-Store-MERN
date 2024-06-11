@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../../utils/constants";
+import { useDispatch } from "react-redux";
+import { addLoggedInUser } from "../../utils/userSlice";
 
 const SignUp = () => {
   const [isLogin, setIsLogin] = useState(false);
@@ -7,30 +10,52 @@ const SignUp = () => {
   const [userData, setUserData] = useState({
     email: "",
     password: "",
+    username: "",
   });
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (isLogin) {
-      (async function () {
-        try {
-          const data = await fetch("http://localhost:8080/user/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(userData),
-          });
-          const json = await data.json();
-          if (!data.ok) {
-            console.log(json);
-            return setError(json.message);
-          }
-
-          navigate("/books");
+      try {
+        const data = await fetch(`${API_BASE_URL}/users/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: userData.email,
+            password: userData.password,
+          }),
+        });
+        const json = await data.json();
+        if (!data.ok) {
           console.log(json);
-        } catch (error) {
-          console.log(error.message);
+          return setError(json.message);
         }
-      })();
+        dispatch(
+          addLoggedInUser({ ...json.data, accessToken: json.accessToken })
+        );
+        navigate("/books");
+      } catch (error) {
+        console.log(error.message);
+      }
+    } else {
+      try {
+        const data = await fetch(`${API_BASE_URL}/users/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userData),
+        });
+        const json = await data.json();
+        if (!data.ok) {
+          console.log(json);
+          return setError(json.message);
+        }
+
+        navigate("/books");
+        console.log(json);
+      } catch (error) {
+        console.log(error.message);
+      }
     }
   };
   const handleChange = (e) => {
@@ -54,31 +79,18 @@ const SignUp = () => {
         <input
           onChange={handleChange}
           type="text"
+          // autoComplete="off"
           placeholder="email"
           name="email"
         />
         {!isLogin && (
-          <>
-            <input
-              onChange={handleChange}
-              type="text"
-              placeholder="username"
-              name="username"
-              className="-order-last"
-            />
-            <input
-              onChange={handleChange}
-              type="number"
-              placeholder="age"
-              name="age"
-            />
-            <input
-              onChange={handleChange}
-              type="number"
-              placeholder="role"
-              name="role"
-            />
-          </>
+          <input
+            onChange={handleChange}
+            type="text"
+            placeholder="username"
+            name="username"
+            className="-order-last"
+          />
         )}
         <input
           onChange={handleChange}
