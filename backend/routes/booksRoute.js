@@ -10,7 +10,6 @@ import {
 import { validateToken } from "../middlewares/validateTokenHandler.js";
 const router = Router();
 
-router.use(validateToken);
 //get all books
 router.get("", getAllBooks);
 
@@ -19,6 +18,7 @@ router.get("/search", searchBook);
 // get a book with specific id
 router.get("/:id", getBook);
 
+router.use(validateToken);
 // Create a book
 router.post("/", createBook);
 

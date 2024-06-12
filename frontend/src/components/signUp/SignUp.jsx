@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/constants";
 import { useDispatch } from "react-redux";
 import { addLoggedInUser } from "../../utils/userSlice";
+import { getToken } from "../../utils/getToken";
+import { useCurrentUser } from "../../utils/hooks/useCurrentUser";
 
 const SignUp = () => {
   const [isLogin, setIsLogin] = useState(false);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [userData, setUserData] = useState({
     email: "",
     password: "",
@@ -14,6 +17,8 @@ const SignUp = () => {
   });
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useCurrentUser();
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isLogin) {
@@ -31,6 +36,9 @@ const SignUp = () => {
           console.log(json);
           return setError(json.message);
         }
+        window.document.cookie = `jwt=${
+          json.accessToken
+        };expires=${new Date().getTime()}+24*60*60*1000`;
         dispatch(
           addLoggedInUser({ ...json.data, accessToken: json.accessToken })
         );
@@ -45,13 +53,12 @@ const SignUp = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(userData),
         });
-        const json = await data.json();
         if (!data.ok) {
-          console.log(json);
-          return setError(json.message);
+          return setError(data.statusText);
         }
 
-        navigate("/books");
+        const json = await data.json();
+        setMessage(json.message);
         console.log(json);
       } catch (error) {
         console.log(error.message);
@@ -100,6 +107,7 @@ const SignUp = () => {
         />
         <button className="bg-black text-white">Submit</button>
       </form>
+      {message && <div className="text-green-600">{error}</div>}
       {error && <div className="text-red-600">{error}</div>}
     </div>
   );

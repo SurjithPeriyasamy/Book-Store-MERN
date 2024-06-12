@@ -10,8 +10,6 @@ const Search = ({ setBooks }) => {
   const books = useSelector((store) => store.books.books);
   const dispatch = useDispatch();
   useEffect(() => {
-    console.log("child", books);
-
     const debounce = setTimeout(() => {
       if (authorResults[authorSearch]) {
         setBooks(authorResults[authorSearch]);

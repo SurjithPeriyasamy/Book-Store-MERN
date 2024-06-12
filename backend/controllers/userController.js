@@ -33,6 +33,9 @@ export const register = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    if (!(email || password)) {
+      return next(catchError("add all fields", 400));
+    }
     const user = await User.findOne({ email });
     if (user && (await bcrypt.compare(password, user.password))) {
       const accessToken = jwt.sign(
@@ -43,7 +46,7 @@ export const login = async (req, res, next) => {
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
-          expiresIn: "10m",
+          expiresIn: "1h",
         }
       );
       // const cookieOptions = {
@@ -63,6 +66,11 @@ export const login = async (req, res, next) => {
   }
 };
 
-export const currentUser = (req, res) => {
-  res.json({ message: "currentUser", user: req.user });
+export const currentUser = async (req, res, next) => {
+  const data = await User.findOne({ _id: req.user.id });
+  if (data) {
+    return res.status(200).json({ message: "currentUser", data });
+  } else {
+    next(catchError('user doesn"t loggedIn', 400));
+  }
 };

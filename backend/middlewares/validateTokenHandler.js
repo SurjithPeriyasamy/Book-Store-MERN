@@ -13,8 +13,11 @@ export const validateToken = (req, res, next) => {
           return next(catchError(err.message, 401));
         }
         req.user = decoded;
+        console.log(req.user);
         return next();
       });
+    } else {
+      return next(catchError("Missing token or not valid", 401));
     }
   } catch (error) {
     next(catchError(error.message));

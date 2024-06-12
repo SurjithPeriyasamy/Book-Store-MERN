@@ -1,6 +1,7 @@
 import { useState } from "react";
 import BackButton from "./BackButton";
 import { useNavigate } from "react-router-dom";
+import { getToken } from "../utils/getToken";
 
 const CreateAndEditBook = ({ method, url }) => {
   const [bookData, setBookData] = useState({
@@ -8,7 +9,7 @@ const CreateAndEditBook = ({ method, url }) => {
     author: "",
     publishYear: "",
   });
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
   const handleChange = (e) => {
@@ -17,24 +18,34 @@ const CreateAndEditBook = ({ method, url }) => {
     setBookData({ ...bookData, [name]: value });
   };
   const handleSave = async () => {
-    if (!bookData.title && !bookData.author && !bookData.publishYear) {
-      return setError(true);
-    }
+    // if (!bookData.title && !bookData.author && !bookData.publishYear) {
+    //   return setError(true);
+    // }
     try {
+      const token = getToken();
+      console.log(token);
       const data = await fetch(url, {
-        method: method,
-        headers: { "Content-Type": "application/json" },
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(bookData),
       });
-      await data.json();
+      console.log(data);
+      const json = await data.json();
+      console.log(json);
+      if (!data.ok) {
+        return setError(json.message);
+      }
 
       setBookData({
         title: "",
         author: "",
         publishYear: "",
       });
-      navigate("/");
-      setError(false);
+      navigate("/books");
+      setError("");
     } catch (error) {
       console.log(error.message);
     }
@@ -74,7 +85,7 @@ const CreateAndEditBook = ({ method, url }) => {
             className="border border-gray-600 p-1 rounded-md w-full"
           />
         </div>
-        {error && <div className="text-red-500">Please Fill All fields</div>}
+        {error && <div className="text-red-500">{error}</div>}
         <button
           onClick={handleSave}
           className="bg-cyan-500 w-3/4 mx-auto rounded-md p-1 font-semibold"

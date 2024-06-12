@@ -9,6 +9,8 @@ import Search from "./Search";
 import { useDispatch, useSelector } from "react-redux";
 import { addBooks } from "../utils/booksSlice";
 import { API_BASE_URL } from "../utils/constants";
+import { getToken } from "../utils/getToken";
+import { useCurrentUser } from "../utils/hooks/useCurrentUser";
 const Home = () => {
   const allBooks = useSelector((store) => store.books);
   const [books, setBooks] = useState([]);
@@ -17,8 +19,8 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const skipCalc = (currPage - 1) * 3;
   const dispatch = useDispatch();
-  const token = useSelector((store) => store.user.loggedInUser.accessToken);
-
+  const user = useSelector((store) => store.user.loggedInUser);
+  useCurrentUser();
   useEffect(() => {
     fetchData();
   }, [currPage]);
@@ -26,6 +28,7 @@ const Home = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
+      const token = getToken();
       const data = await fetch(
         `${API_BASE_URL}/books?skip=${skipCalc}&limit=3`,
         {
@@ -34,7 +37,6 @@ const Home = () => {
         }
       );
       const json = await data.json();
-
       setBooks(json.data);
       dispatch(addBooks(json));
       setLoading(false);
@@ -47,9 +49,14 @@ const Home = () => {
   for (let i = 1; i <= Math.ceil(allBooks.count / 3); i++) {
     page.push(i);
   }
-  console.log(books);
+
   return (
     <div className="space-y-5">
+      <div className="p-2 bg-cyan-600 w-fit rounded-lg mx-auto flex flex-col items-center">
+        <div>Welcome To My Book Store</div>
+        <h3>Hello {user.username} !!!!!</h3>
+        <h4>{user.email}</h4>
+      </div>
       <div className="mt-8 flex justify-between items-center">
         <h2 className="text-4xl font-semibold">Books List</h2>
         <Search setBooks={setBooks} />
@@ -84,12 +91,16 @@ const Home = () => {
                   <Link to={`/books/details/${book._id}`}>
                     <FcViewDetails />
                   </Link>
-                  <Link to={`/books/edit/${book._id}`}>
-                    <MdEditNote className="text-yellow-500" />
-                  </Link>
-                  <Link to={`/books/delete/${book._id}`}>
-                    <MdDeleteSweep className="text-red-600" />
-                  </Link>
+                  {user._id === book.user_id && (
+                    <>
+                      <Link to={`/books/edit/${book._id}`}>
+                        <MdEditNote className="text-yellow-500" />
+                      </Link>
+                      <Link to={`/books/delete/${book._id}`}>
+                        <MdDeleteSweep className="text-red-600" />
+                      </Link>
+                    </>
+                  )}
                 </td>
               </tr>
             ))
