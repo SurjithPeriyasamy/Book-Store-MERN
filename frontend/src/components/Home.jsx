@@ -9,8 +9,8 @@ import Search from "./Search";
 import { useDispatch, useSelector } from "react-redux";
 import { addBooks } from "../utils/booksSlice";
 import { API_BASE_URL } from "../utils/constants";
-import { getToken } from "../utils/getToken";
 import { useCurrentUser } from "../utils/hooks/useCurrentUser";
+import { useCookie } from "../utils/hooks/useCookie";
 const Home = () => {
   const allBooks = useSelector((store) => store.books);
   const [books, setBooks] = useState([]);
@@ -21,6 +21,7 @@ const Home = () => {
   const dispatch = useDispatch();
   const user = useSelector((store) => store.user.loggedInUser);
   useCurrentUser();
+  const token = useCookie;
   useEffect(() => {
     fetchData();
   }, [currPage]);
@@ -28,12 +29,11 @@ const Home = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const token = getToken();
       const data = await fetch(
         `${API_BASE_URL}/books?skip=${skipCalc}&limit=3`,
         {
           method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token("jwt")}` },
         }
       );
       const json = await data.json();
@@ -109,17 +109,18 @@ const Home = () => {
       </table>
 
       <div className="mx-auto w-fit flex *:px-3 *:py-1  gap-5 text-white *:rounded-lg">
-        {page.map((p) => (
-          <button
-            onClick={() => {
-              setCurrpage(p);
-            }}
-            className={`${p === currPage ? "bg-red-600" : "bg-gray-600"}`}
-            key={p}
-          >
-            {p}
-          </button>
-        ))}
+        {books.length &&
+          page.map((p) => (
+            <button
+              onClick={() => {
+                setCurrpage(p);
+              }}
+              className={`${p === currPage ? "bg-red-600" : "bg-gray-600"}`}
+              key={p}
+            >
+              {p}
+            </button>
+          ))}
       </div>
     </div>
   );

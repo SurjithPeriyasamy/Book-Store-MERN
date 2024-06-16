@@ -2,7 +2,6 @@ import express from "express";
 import mongoose from "mongoose";
 import booksRoute from "./routes/booksRoute.js";
 import cors from "cors";
-import { getAllBooks } from "./controllers/bookController.js";
 import userRoute from "./routes/userRoutes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import cookieParser from "cookie-parser";
@@ -13,7 +12,7 @@ configDotenv();
 const port = process.env.PORT;
 //Middleware for parsing request body
 app.use(express.json());
-app.use(cors());
+app.use(cors(""));
 app.use(cookieParser());
 main().catch((err) => console.log(err));
 

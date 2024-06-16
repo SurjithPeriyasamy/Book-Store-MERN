@@ -1,13 +1,16 @@
 import BackButton from "./BackButton";
 import { API_BASE_URL } from "../utils/constants";
 import { useNavigate, useParams } from "react-router-dom";
+import { useCookie } from "../utils/hooks/useCookie";
 const DeleteBook = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const token = useCookie;
   const handleDelete = async () => {
     try {
       const data = await fetch(API_BASE_URL + "/" + id, {
         method: "DELETE",
+        headers: { Authoriztaion: `Bearer ${token("jwt")}` },
       });
       const json = await data.json();
       console.log(json);

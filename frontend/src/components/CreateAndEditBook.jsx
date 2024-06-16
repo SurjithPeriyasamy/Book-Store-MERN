@@ -1,8 +1,7 @@
 import { useState } from "react";
 import BackButton from "./BackButton";
 import { useNavigate } from "react-router-dom";
-import { getToken } from "../utils/getToken";
-
+import { useCookie } from "../utils/hooks/useCookie";
 const CreateAndEditBook = ({ method, url }) => {
   const [bookData, setBookData] = useState({
     title: "",
@@ -17,24 +16,21 @@ const CreateAndEditBook = ({ method, url }) => {
 
     setBookData({ ...bookData, [name]: value });
   };
+  const token = useCookie;
   const handleSave = async () => {
     // if (!bookData.title && !bookData.author && !bookData.publishYear) {
     //   return setError(true);
     // }
     try {
-      const token = getToken();
-      console.log(token);
       const data = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token("jwt")}`,
         },
         body: JSON.stringify(bookData),
       });
-      console.log(data);
       const json = await data.json();
-      console.log(json);
       if (!data.ok) {
         return setError(json.message);
       }

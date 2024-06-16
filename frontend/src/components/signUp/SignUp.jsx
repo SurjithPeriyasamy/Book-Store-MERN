@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/constants";
 import { useDispatch } from "react-redux";
 import { addLoggedInUser } from "../../utils/userSlice";
-import { getToken } from "../../utils/getToken";
 import { useCurrentUser } from "../../utils/hooks/useCurrentUser";
+import cookies from "js-cookie";
 
 const SignUp = () => {
   const [isLogin, setIsLogin] = useState(false);
@@ -33,12 +33,13 @@ const SignUp = () => {
         });
         const json = await data.json();
         if (!data.ok) {
-          console.log(json);
+          console.log("json", json);
           return setError(json.message);
         }
-        window.document.cookie = `jwt=${
-          json.accessToken
-        };expires=${new Date().getTime()}+24*60*60*1000`;
+        cookies.set("jwt", json.accessToken);
+        // window.document.cookie = `jwt=${
+        //   json.accessToken
+        // };expires=${new Date().getTime()}+24*60*60*1000`;
         dispatch(
           addLoggedInUser({ ...json.data, accessToken: json.accessToken })
         );
